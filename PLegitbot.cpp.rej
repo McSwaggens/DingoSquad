@@ -1,0 +1,9 @@
+diff a/PLegitbot.cpp b/PLegitbot.cpp	(rejected hunks)
+@@ -293,7 +293,6 @@
+ 		if (firstt) {
+ 				for (int i = 0; i < 7; i++) {
+ 					float temp = FovToPlayer(ViewOffSet, View, pEntity, hitboxes[i]);
+-					cout << hitboxes[i] << " = " << temp << endl;
+ 					if (temp < perm) {
+ 						perm = temp;
+ 						returnval = hitboxes[i];

@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Hack">
+      <UniqueIdentifier>{20db76e4-4e47-40ec-a46b-20bd2f9a71f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK">
+      <UniqueIdentifier>{aa9419da-edb7-4dbe-a543-f3085a88c551}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Hack\Hooking">
+      <UniqueIdentifier>{a4ae096f-f1ab-47f2-a544-014b1e436223}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hack\Hooks">
+      <UniqueIdentifier>{312b49b8-c88d-4d7a-843b-aa6c18ecbb07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\SDK Headers">
+      <UniqueIdentifier>{f8d06c3a-c271-4d28-b42b-cc0929751f7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{986e73bd-2d05-46b3-be7e-de118d0633f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hack\Hack">
+      <UniqueIdentifier>{526b5c8a-1afd-4114-8a3f-d9094585d3c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\SDK Headers\Valve">
+      <UniqueIdentifier>{e5e8d572-620a-45ca-9243-daaae7428e4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDK\Math">
+      <UniqueIdentifier>{1a586bea-17a5-4963-95c5-0ded167d507e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hack\Hack\Ragebot">
+      <UniqueIdentifier>{95239bff-9c37-46e5-a462-e695615e3199}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hack\Hack\Legitbot">
+      <UniqueIdentifier>{880f54da-2606-498d-be4e-3d37b6e3a061}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Files\Settings">
+      <UniqueIdentifier>{fd811e49-f41b-4fd0-881b-2c081632e869}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hack\Hack\Menu">
+      <UniqueIdentifier>{b5f1a441-9fdc-4ad3-8d37-68baa58c5ce3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="C_URL">
+      <UniqueIdentifier>{71f8115b-af00-4c61-bfbd-6ef66b1335ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hack\Hack\Playerlist">
+      <UniqueIdentifier>{3f283466-55d9-498a-a5bc-253ae42abd26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hack\Hack\Resolver">
+      <UniqueIdentifier>{fc36b7b8-065b-4aec-a811-719be077564d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hack\Hack\Eventlistender">
+      <UniqueIdentifier>{0beacc7e-882e-4b91-9dff-73ac0cf17202}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hack\Hack\Skin Changer">
+      <UniqueIdentifier>{7a0e2cde-c8be-4ad2-a021-3079c8b79063}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+    <Text Include="netvar_dump5-Jul-16.txt">
+      <Filter>Main Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VMTManager.h">
+      <Filter>Hack\Hooking</Filter>
+    </ClInclude>
+    <ClInclude Include="Hooks.h">
+      <Filter>Hack\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="ISurface.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleColours.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CClient.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="checksum_crc.h">
+      <Filter>SDK\SDK Headers\Valve</Filter>
+    </ClInclude>
+    <ClInclude Include="dt_common2.h">
+      <Filter>SDK\SDK Headers\Valve</Filter>
+    </ClInclude>
+    <ClInclude Include="dt_recv2.h">
+      <Filter>SDK\SDK Headers\Valve</Filter>
+    </ClInclude>
+    <ClInclude Include="platform.h">
+      <Filter>SDK\SDK Headers\Valve</Filter>
+    </ClInclude>
+    <ClInclude Include="valve_off.h">
+      <Filter>SDK\SDK Headers\Valve</Filter>
+    </ClInclude>
+    <ClInclude Include="valve_on.h">
+      <Filter>SDK\SDK Headers\Valve</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>SDK\SDK Headers\Valve</Filter>
+    </ClInclude>
+    <ClInclude Include="wchartypes.h">
+      <Filter>SDK\SDK Headers\Valve</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineClient.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Vectors.h">
+      <Filter>SDK\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EntList.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Entitys.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="NetVars.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugOverlay.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CTrace.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CModelInfo.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="IVRenderView.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CInput.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ICVars.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CGlobleVars.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameMovement.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CPred.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CGlow.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK_Others.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Hacks.h">
+      <Filter>Hack\Hack</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsManger.h">
+      <Filter>Main Files\Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="Ragebot.h">
+      <Filter>Hack\Hack\Ragebot</Filter>
+    </ClInclude>
+    <ClInclude Include="Legitbot.h">
+      <Filter>Hack\Hack\Legitbot</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>SDK\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Hack\Hack\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Playerlist.h">
+      <Filter>Hack\Hack\Playerlist</Filter>
+    </ClInclude>
+    <ClInclude Include="PLegitbot.h">
+      <Filter>Hack\Hack\Legitbot</Filter>
+    </ClInclude>
+    <ClInclude Include="Resolver.h">
+      <Filter>Hack\Hack\Resolver</Filter>
+    </ClInclude>
+    <ClInclude Include="hwutils.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="oldplist.h">
+      <Filter>Hack\Hack\Playerlist</Filter>
+    </ClInclude>
+    <ClInclude Include="CGameEvent.h">
+      <Filter>SDK\SDK Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Skins.h">
+      <Filter>Hack\Hack\Skin Changer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Main Files</Filter>
+    </ClCompile>
+    <ClCompile Include="csgocheat.cpp">
+      <Filter>Main Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Main Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VMTManager.cpp">
+      <Filter>Hack\Hooking</Filter>
+    </ClCompile>
+    <ClCompile Include="checksum_crc.cpp">
+      <Filter>SDK\SDK Headers\Valve</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Hooks.cpp">
+      <Filter>Hack\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Hacks.cpp">
+      <Filter>Hack\Hack</Filter>
+    </ClCompile>
+    <ClCompile Include="Ragebot.cpp">
+      <Filter>Hack\Hack\Ragebot</Filter>
+    </ClCompile>
+    <ClCompile Include="Legitbot.cpp">
+      <Filter>Hack\Hack\Legitbot</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsManger.cpp">
+      <Filter>Main Files\Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="Math.cpp">
+      <Filter>SDK\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Hack\Hack\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="PLegitbot.cpp">
+      <Filter>Hack\Hack\Legitbot</Filter>
+    </ClCompile>
+    <ClCompile Include="Resolver.cpp">
+      <Filter>Hack\Hack\Resolver</Filter>
+    </ClCompile>
+    <ClCompile Include="hwutils.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Skins.cpp">
+      <Filter>Hack\Hack\Skin Changer</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

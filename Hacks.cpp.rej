@@ -1,0 +1,199 @@
+diff a/Hacks.cpp b/Hacks.cpp	(rejected hunks)
+@@ -696,107 +696,111 @@
+ 		Vector oldAngles = Hacks.CurrentCmd->viewangles;
+ 		if (!Hacks.LocalPlayer)return;
+ 		Hacks.LocalWeapon = Hacks.LocalPlayer->GetActiveBaseCombatWeapon();
+-		if (!Hacks.LocalWeapon) return;
++if (!Hacks.LocalWeapon) return;
+ #pragma endregion
+-		Vector OrigAng = Hacks.CurrentCmd->viewangles;
++Vector OrigAng = Hacks.CurrentCmd->viewangles;
+ #pragma region Do Hacks
+-		if (Hacks.LocalPlayer)
+-		{
++if (Hacks.LocalPlayer)
++{
+ 
+-			if (Hacks.LocalPlayer->isAlive())
+-			{
+-				bool alive = anyAlive();
++	if (Hacks.LocalPlayer->isAlive())
++	{
++		bool alive = anyAlive();
+ 
+ 
+-				Settings.weaponconfigs();
++		Settings.weaponconfigs();
+ 
+-				if (!CircleStrafer(OrigAng))
+-					if (Settings.GetBoolSetting(Tab_Misc, Misc_Auto_Strafer))
+-						AutoStrafer();
++		if (!CircleStrafer(OrigAng))
++			if (Settings.GetBoolSetting(Tab_Misc, Misc_Auto_Strafer))
++				AutoStrafer();
+ 
+-				if (Settings.GetBoolSetting(Tab_Misc, Misc_Bunny_Hop))
+-					BunnyHop();
++		if (Settings.GetBoolSetting(Tab_Misc, Misc_Bunny_Hop))
++			BunnyHop();
+ 
+-				if (Settings.GetBoolSetting(Tab_Misc, Misc_Teleport_Enable) && !Settings.GetBoolSetting(Tab_Misc, Misc_Anti_Untrust))
+-				{
+-					int telval = Settings.GetSetting(Tab_Misc, Misc_Teliport_Type);
+-					switch (telval) {
+-					case 1:
+-						Teleport();
+-						break;
+-					case 2:
+-						TeleportZ(Hacks.CurrentCmd->viewangles);
+-						break;
+-					case 3:
+-						TeleportInvert(Hacks.CurrentCmd->viewangles);
+-						break;
+-					}
+-				}
+-				if (Settings.GetSetting(Tab_Misc, Misc_Anti_Untrust))
+-					alive = true;
++		if (Settings.GetBoolSetting(Tab_Misc, Misc_Teleport_Enable) && !Settings.GetBoolSetting(Tab_Misc, Misc_Anti_Untrust))
++		{
++			int telval = Settings.GetSetting(Tab_Misc, Misc_Teliport_Type);
++			switch (telval) {
++			case 1:
++				Teleport();
++				break;
++			case 2:
++				TeleportZ(Hacks.CurrentCmd->viewangles);
++				break;
++			case 3:
++				TeleportInvert(Hacks.CurrentCmd->viewangles);
++				break;
++			}
++		}
++		if (Settings.GetSetting(Tab_Misc, Misc_Anti_Untrust))
++			alive = true;
+ 
+-				if (alive)
+-				{
++		if (alive)
++		{
+ #pragma region Prediction
+-					// Can Do Prediction Because We Have The Move Helper, If Not Pattern Search It And Try Again Next Packet
+-					if (Interfaces.g_pMoveHelper)
+-					{
+-						int TickBase = Hacks.LocalPlayer->GetTickBase(); // Get The Tick Base
+-						int Old_Time = Interfaces.pGlobalVars->curtime; // Get Current Time (Client Not Server)
+-						int Old_Frame_Time = Interfaces.pGlobalVars->frametime; // Get Frame Time (Client)
+-
+-						Interfaces.pGlobalVars->curtime = TickBase * Interfaces.pGlobalVars->interval_per_tick; // Set Time To Server Time
+-						Interfaces.pGlobalVars->frametime = Interfaces.pGlobalVars->interval_per_tick; // Set Framerate To Tick Rate
+-
+-						CMoveData Move_Data; // Make A Move Data
+-						memset(&Move_Data, 0, sizeof(Move_Data));
+-						bool Ducked = false;
+-						if (Hacks.CurrentCmd->buttons & IN_DUCK)
+-							Ducked = true;
+-						int duvkval = Settings.GetSetting(Tab_Ragebot, Ragebot_Duck);
+-						switch (duvkval) {
+-						case 2:
+-							Hacks.CurrentCmd->buttons &= ~IN_DUCK;
+-							break;
+-						}
+-						Interfaces.g_pMoveHelper->SetHost(Hacks.LocalPlayer); // Set Myself To Get Predicted
+-						Interfaces.g_pPred->SetupMove(Hacks.LocalPlayer, Hacks.CurrentCmd, Interfaces.g_pMoveHelper, &Move_Data); // Setup Prediction
+-						Interfaces.g_pGameMovement->ProcessMovement(Hacks.LocalPlayer, &Move_Data); // Process Prediction
+-						Interfaces.g_pPred->FinishMove(Hacks.LocalPlayer, Hacks.CurrentCmd, &Move_Data); // Finish Prediction
+-						Interfaces.g_pGameMovement->DecayPunchAngles();
+-						Interfaces.g_pMoveHelper->SetHost(NULL); // Remove Self From Move Helper
+-						if (Ducked)
+-							Hacks.CurrentCmd->buttons |= IN_DUCK;
+-
+-						Interfaces.pGlobalVars->curtime = Old_Time;  // Reset Times To Correct Time
+-						Interfaces.pGlobalVars->frametime = Old_Frame_Time; // Reset Frame Time To Correct Time
+-
+-						CBaseCombatWeapon* pWeapon = Hacks.LocalPlayer->GetActiveBaseCombatWeapon();
+-						if (pWeapon)
+-							pWeapon->UpdateAccuracyPenalty();
+-					}
+-					else
+-					{
+-						// if we dont have a pointer to Move Helper, Find One.
+-						Interfaces.g_pMoveHelper = **(IMoveHelper***)(Utils.PatternSearch("client.dll", (PBYTE)"\x8B\x0D\x00\x00\x00\x00\x8B\x45\x00\x51\x8B\xD4\x89\x02\x8B\x01", "xx????xx?xxxxxxx", NULL, NULL) + 2);
+-					}
++			// Can Do Prediction Because We Have The Move Helper, If Not Pattern Search It And Try Again Next Packet
++			if (Interfaces.g_pMoveHelper)
++			{
++				int TickBase = Hacks.LocalPlayer->GetTickBase(); // Get The Tick Base
++				int Old_Time = Interfaces.pGlobalVars->curtime; // Get Current Time (Client Not Server)
++				int Old_Frame_Time = Interfaces.pGlobalVars->frametime; // Get Frame Time (Client)
++
++				Interfaces.pGlobalVars->curtime = TickBase * Interfaces.pGlobalVars->interval_per_tick; // Set Time To Server Time
++				Interfaces.pGlobalVars->frametime = Interfaces.pGlobalVars->interval_per_tick; // Set Framerate To Tick Rate
++
++				CMoveData Move_Data; // Make A Move Data
++				memset(&Move_Data, 0, sizeof(Move_Data));
++				bool Ducked = false;
++				if (Hacks.CurrentCmd->buttons & IN_DUCK)
++					Ducked = true;
++				int duvkval = Settings.GetSetting(Tab_Ragebot, Ragebot_Duck);
++				switch (duvkval) {
++				case 2:
++					Hacks.CurrentCmd->buttons &= ~IN_DUCK;
++					break;
++				}
++				Interfaces.g_pMoveHelper->SetHost(Hacks.LocalPlayer); // Set Myself To Get Predicted
++				Interfaces.g_pPred->SetupMove(Hacks.LocalPlayer, Hacks.CurrentCmd, Interfaces.g_pMoveHelper, &Move_Data); // Setup Prediction
++				Interfaces.g_pGameMovement->ProcessMovement(Hacks.LocalPlayer, &Move_Data); // Process Prediction
++				Interfaces.g_pPred->FinishMove(Hacks.LocalPlayer, Hacks.CurrentCmd, &Move_Data); // Finish Prediction
++				Interfaces.g_pGameMovement->DecayPunchAngles();
++				Interfaces.g_pMoveHelper->SetHost(NULL); // Remove Self From Move Helper
++				if (Ducked)
++					Hacks.CurrentCmd->buttons |= IN_DUCK;
++
++				Interfaces.pGlobalVars->curtime = Old_Time;  // Reset Times To Correct Time
++				Interfaces.pGlobalVars->frametime = Old_Frame_Time; // Reset Frame Time To Correct Time
++
++				CBaseCombatWeapon* pWeapon = Hacks.LocalPlayer->GetActiveBaseCombatWeapon();
++				if (pWeapon)
++					pWeapon->UpdateAccuracyPenalty();
++			}
++			else
++			{
++				// if we dont have a pointer to Move Helper, Find One.
++				Interfaces.g_pMoveHelper = **(IMoveHelper***)(Utils.PatternSearch("client.dll", (PBYTE)"\x8B\x0D\x00\x00\x00\x00\x8B\x45\x00\x51\x8B\xD4\x89\x02\x8B\x01", "xx????xx?xxxxxxx", NULL, NULL) + 2);
++			}
+ #pragma endregion Player And Others Prediction
+ 
+ 
+-					if (Settings.GetBoolSetting(Tab_Ragebot, Ragebot_Enable))
+-						Ragebot.NewMove();
++			if (Settings.GetBoolSetting(Tab_Ragebot, Ragebot_Enable))
++				Ragebot.NewMove();
+ 
+ 
+-					int duvkval = Settings.GetSetting(Tab_Ragebot, Ragebot_Duck);
+-					switch (duvkval) {
+-					case 2:
+-						if (Hacks.CurrentCmd->buttons & IN_ATTACK)
+-							Hacks.CurrentCmd->buttons &= ~IN_DUCK;
+-						break;
+-					}
+-				}
+-				if (Settings.GetSetting(Tab_LegitBot, Legit_Activate)|| Settings.GetBoolSetting(Tab_LegitBot, Trigger_Active))
+-					Legitbot.Move();
++			int duvkval = Settings.GetSetting(Tab_Ragebot, Ragebot_Duck);
++			switch (duvkval) {
++			case 2:
++				if (Hacks.CurrentCmd->buttons & IN_ATTACK)
++					Hacks.CurrentCmd->buttons &= ~IN_DUCK;
++				break;
++			}
++		}
++		if (Settings.GetSetting(Tab_LegitBot, Legit_Activate) || Settings.GetBoolSetting(Tab_LegitBot, Trigger_Active)) {
++			if(Settings.GetSetting(Tab_LegitBot, Legit_ME))
++				Legitbot.Move();
++			else
++				dolegitshit();
++		}
+ 					
+ 				//if(Settings.GetSetting(Tab_LegitBot, Old_Legit_Activate))
+ 					//dolegitshit();
