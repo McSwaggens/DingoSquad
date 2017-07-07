@@ -277,14 +277,13 @@ void UTIL_ClipTraceToPlayers( Vector& vecAbsStart,  Vector& vecAbsEnd, unsigned 
 
 	for (int k = 1; k <= Interfaces.pGlobalVars->maxClients; ++k)
 	{
-		CBaseEntity *player = Interfaces.pEntList->GetClientEntity(k);
+		CBaseEntity* player = Interfaces.pEntList->GetClientEntity(k);
 
 		if (!player || !player->isAlive())
 			continue;
 
 		if (player->IsDormant())
 			continue;
-
 
 		if (filter && filter->ShouldHitEntity(player, mask) == false)
 			continue;
@@ -306,26 +305,26 @@ void UTIL_ClipTraceToPlayers( Vector& vecAbsStart,  Vector& vecAbsEnd, unsigned 
 bool TraceToExit(Vector& end, trace_t& tr, Vector start, Vector vEnd, trace_t* trace)
 {
 	typedef bool(__fastcall* TraceToExitFn)(Vector&, trace_t&, float, float, float, float, float, float, trace_t*);
-	static DWORD TraceToExit = Utils.PatternSearch("client.dll", (BYTE*)"\x55\x8B\xEC\x83\xEC\x2C\xF3\x0F\x10\x75\x00\x33\xC0", "xxxxxxxxxx?xx", NULL, NULL);
+	static DWORD TraceToExit = Utils.PatternSearch("client.dll", (BYTE*)"\x55\x8B\xEC\x83\xEC\x30\xF3\x0F\x10\x75", "xxxxxxxxxx", NULL, NULL);
 
 	if (!TraceToExit)
 		return false;
-	
+
 	float start_y = start.y, start_z = start.z, start_x = start.x, dir_y = vEnd.y, dir_x = vEnd.x, dir_z = vEnd.z;
 
 	_asm
 	{
 		push trace
 		push dir_z
-			push dir_y
-			push dir_x
-			push start_z
-			push start_y
-			push start_x
-			mov edx, tr
-			mov ecx, end
-			call TraceToExit
-			add esp, 0x1C
+		push dir_y
+		push dir_x
+		push start_z
+		push start_y
+		push start_x
+		mov edx, tr
+		mov ecx, end
+		call TraceToExit
+		add esp, 0x1C
 	}
 
 }

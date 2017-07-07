@@ -46,7 +46,10 @@ typedef unsigned __int64		uint64;
 typedef float					vec_t;
 
 class VMatrix;
-
+class IClientModeShared
+{
+public:
+};
 
 //USERCMD OFFSETS
 #define USERCMDOFFSET 0xEC
@@ -110,6 +113,18 @@ enum MoveType_t
 	MOVETYPE_MAX_BITS = 4
 };
 
+enum class ObserverMode_t : int
+{
+	OBS_MODE_NONE = 0,
+	OBS_MODE_DEATHCAM = 1,
+	OBS_MODE_FREEZECAM = 2,
+	OBS_MODE_FIXED = 3,
+	OBS_MODE_IN_EYE = 4,
+	OBS_MODE_CHASE = 5,
+	OBS_MODE_ROAMING = 6
+};
+
+
 //USERCMD BUTTONS
 #define IN_ATTACK		(1 << 0)
 #define IN_JUMP			(1 << 1)
@@ -159,12 +174,23 @@ class IMaterialSystem;
 class IGameEventManager2;
 class IVRenderView;
 class ICVar;
-
+class IClientModeShared;
 
 
 class CInterfaces
 {
 private:
+	DWORD WaitOnModuleHandle(std::string moduleName)
+	{
+		DWORD ModuleHandle = NULL;
+		while (!ModuleHandle)
+		{
+			ModuleHandle = (DWORD)GetModuleHandle(moduleName.c_str());
+			if (!ModuleHandle)
+				Sleep(50);
+		}
+		return ModuleHandle;
+	}
 	void* GetPointer(const char* Module, const char* InterfaceName)
 	{
 		void* Interface = NULL;
@@ -247,52 +273,79 @@ public:
 	}
 	void InitialiseSDK()
 	{
-		DWORD dwInitAddress = Utils.PatternSearch("engine.dll", (PBYTE)"\x55\x8B\xEC\x81\xEC\x00\x00\x00\x00\x53\x56\x57\xE8\x00\x00\x00\x00\x83\x3D\x00\x00\x00\x00\x00", "xxxxx????xxxx????xx?????", NULL, NULL);
+		/*cout << white << "The VAC module is scanning" << white << "......" << white << endl;
+		Sleep(2000);
+		cout << white << "The VAC module is scanning...." << green << "  Done!" << white << endl;
+		cout << white << "The VAC module Signature is " << ired << "  lukcncOOSvHkrueGgGA7WDcbAJxj32VNZiNiYv7MYmP3hjfRwL" << white << endl;
+		cout << white << "A code mutation is performed...." << white << "" << white << endl;
+		Sleep(3000);
+		cout << white << "A code mutation is performed:\n" << green << "rndseed = 100500\nmacro randomize{\nrandseed = randseed * 1103515245 + 12345\nrandseed = (randseed / 65536) mod 0x100000000\nrndnum = randseed and 0xFFFFFFFF\n}" << white << endl;
+		Sleep(2000);
+		cout << white << "A code mutation is performed:\n" << green << "randomize\nint_val = rndnum mod 0xFF" << white << endl;
+		Sleep(2000);
+		cout << white << "A code mutation is performed\n" << green << "cd78 | int 0x78\ncda6 | int 0xa6\ncdb4 | int 0xb4n\ncd36 | int 0x36n\ncdec | int 0xec\ncd6a | int 0x6a\ncd68 | int 0x68" << white << endl;
+		Sleep(2000);
+		cout << white << "A code mutation is performed" << green << "  Done!" << white << endl;
+		Sleep(100);
+		cout << white << "0XACE randomization of api calls" << green << "  Done!" << white << endl;
+		
+		Sleep(100);
+		cout << white << "New Build was created:..." << green << "  Done!" << white << endl;*/
+		
+
+		DWORD dwInitAddress = Utils.PFindPattern("engine.dll", "A1 ? ? ? ? 33 D2 6A ? 6A ? 33 C9 89 B0 08 4E ? ? A1");
 		cout << igreen << "dwInitAddress: " << ired << "0x" << dwInitAddress << white << endl;
 
-		DWORD p = Utils.PatternSearch("client.dll", (BYTE*)"\xC7\x05\x00\x00\x00\x00\x00\x00\x00\x00\xA8\x01\x75\x1A\x83\xC8\x01\xA3\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x68\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x83\xC4\x04\xA1\x00\x00\x00\x00\xB9\x00\x00\x00\x00\x56", "xx????????xxxxxxxx????x????x????x????xxxx????x????x", NULL, NULL);
+		DWORD p = Utils.PFindPattern("client.dll", "8B 0D ? ? ? ? FF 75 08 8B 01 FF 50 64");
 
 		if (p)
 		{
 			pClientMode = **(DWORD***)(p + 2);
 			pClientMode = pClientMode;
 		}
-
 		cout << iblue << "pClientMode" << igreen << ": 0x" << pClientMode << white << endl;
 
 		CreateInterfaceFn fnEngineFactory = (CreateInterfaceFn)GetProcAddress(GetModuleHandleA("engine.dll"), "CreateInterface");
-		CreateInterfaceFn AppSystemFactory = (CreateInterfaceFn)**(PDWORD*)(dwInitAddress + 0x3D);
+		CreateInterfaceFn AppSystemFactory = (CreateInterfaceFn)GetProcAddress((HMODULE)GetModuleHandle("vguimatsurface.dll"), "CreateInterface");//**(PDWORD*)//(dwInitAddress + 0x3D);
 		CreateInterfaceFn MaterialSystemFactory = (CreateInterfaceFn)GetProcAddress((HMODULE)GetModuleHandle("materialsystem.dll"), "CreateInterface");
-		CreateInterfaceFn ClientFactory = (CreateInterfaceFn)**(PDWORD*)(dwInitAddress + 0x75);
+		CreateInterfaceFn ClientFactory = (CreateInterfaceFn)GetProcAddress((HMODULE)GetModuleHandle("client.dll"), "CreateInterface");
 		CreateInterfaceFn StdFactory = (CreateInterfaceFn)GetProcAddress((HMODULE)GetModuleHandle("vstdlib.dll"), "CreateInterface");
+        CreateInterfaceFn VGUISurfaceFactory= (CreateInterfaceFn)GetProcAddress((HMODULE)GetModuleHandle("vgui2.dll"), "CreateInterface");
+		//CreateInterfaceFn VGUI2Factory = (CreateInterfaceFn)GetProcAddress((HMODULE)GetModuleHandle("vgui2.dll"), "CreateInterface");
+		CreateInterfaceFn PhysFactory = (CreateInterfaceFn)GetProcAddress((HMODULE)GetModuleHandle("vphysics.dll"), "CreateInterface");
+		
+		
 
 		typedef CGlowObjectManager*(__thiscall* GetGlowObjectManager_t)(void);
-		static GetGlowObjectManager_t GetGlowObjectManager = (GetGlowObjectManager_t)Utils.PatternSearch("client.dll", (PBYTE)"\xA1\x00\x00\x00\x00\xA8\x01\x75\x4E", "x????xxxx", NULL, NULL);
+		static GetGlowObjectManager_t GetGlowObjectManager = (GetGlowObjectManager_t)Utils.PFindPattern("client.dll", "A1 ? ? ? ? A8 01 75 4B");
 		g_pGlowObjectManager = GetGlowObjectManager();
-		cout << iblue << "g_pGlowObjectManager:" << igreen << g_pGlowObjectManager << endl;
+		cout << iblue << "g_pGlowObjectManager:" << igreen<<  ": 0x" << g_pGlowObjectManager << white  << endl;
 
 		pSurface = (ISurface*)GetInterfacePtr("VGUI_Surface", "g_pSurface", AppSystemFactory);
-		pPanel = (IPanel*)GetInterfacePtr("VGUI_Panel", "g_pPanel", AppSystemFactory);
+		pPanel = (IPanel*)GetInterfacePtr("VGUI_Panel", "g_pPanel", VGUISurfaceFactory);
+	    //pClient = (HLCLient*)GetPointer("client.dll", "VClient018");
 		pClient = (HLCLient*)GetInterfacePtr("VClient", "g_pClient", ClientFactory);
-		pEngine = (CEngineClient*)GetInterfacePtr("VEngineClient", "g_pEngine", AppSystemFactory);
+        pEngine = (CEngineClient*)GetInterfacePtr("VEngineClient", "g_pEngine", fnEngineFactory);
 		pEntList = (CEntityList*)GetInterfacePtr("VClientEntityList", "g_pEntList", ClientFactory);
-		g_pDebugOverlay = (CDebugOverlay*)GetInterfacePtr("VDebugOverlay", "g_pDebugOverlay", AppSystemFactory);
-		pTrace = (IEngineTrace*)GetInterfacePtr("EngineTraceClient", "g_pEngineTraceClient", AppSystemFactory);
-		g_pModelInfo = (IVModelInfo*)GetInterfacePtr("VModelInfoClient", "g_pModelInfo", AppSystemFactory);
-		g_pModelRender = (IVModelRender*)GetInterfacePtr("VEngineModel", "g_ModelRender", AppSystemFactory);
+		g_pDebugOverlay = (CDebugOverlay*)GetInterfacePtr("VDebugOverlay", "g_pDebugOverlay", fnEngineFactory);
+		pTrace = (IEngineTrace*)GetInterfacePtr("EngineTraceClient", "g_pEngineTraceClient", fnEngineFactory);
+		g_pModelInfo = (IVModelInfo*)GetInterfacePtr("VModelInfoClient", "g_pModelInfo", fnEngineFactory);
+		g_pModelRender = (IVModelRender*)GetInterfacePtr("VEngineModel", "g_ModelRender", fnEngineFactory);
 		g_pPred = (CPrediction*)GetInterfacePtr("VClientPrediction", "g_pPred", ClientFactory);
 		g_pGameMovement = (CGameMovement*)GetInterfacePtr("GameMovement", "g_pGameMovement", ClientFactory);
-		pPhysProps = (IPhysicsSurfaceProps*)GetInterfacePtr("VPhysicsSurfaceProps", "g_pPhysprops", AppSystemFactory);
+		pPhysProps = (IPhysicsSurfaceProps*)GetInterfacePtr("VPhysicsSurfaceProps", "g_pPhysprops", PhysFactory);
 		pMaterialSystem = (IMaterialSystem*)GetInterfacePtr("VMaterialSystem", "pMaterialSystem", MaterialSystemFactory);
-		g_pRenderView = (IVRenderView*)GetInterfacePtr("VEngineRenderView", "g_pRenderView", AppSystemFactory);
-		pGlobalVars = *(CGlobalVars**)(((*(PDWORD*)pClient)[0]) + GLOBALSOFFSET);
+		g_pRenderView = (IVRenderView*)GetInterfacePtr("VEngineRenderView", "g_pRenderView", fnEngineFactory);
+		pGlobalVars = *(CGlobalVars**)(((*(PDWORD*)pClient)[0]) + 0x1B);
 		pGlobalVars = (CGlobalVars*)*(PDWORD)pGlobalVars;
 		cout << iblue << "pGlobalVars " << igreen << ": 0x" << pGlobalVars << white << endl;
-		pInput = *(CInput**)((*(DWORD**)pClient)[15] + 0x1);
+		pInput = *(CInput**)((*(DWORD**)pClient)[15] + 0x1);//[15] + 0x1)
 		g_ICVars = (ICVar*)GetInterfacePtr("VEngineCvar", "g_pCVars", StdFactory);
 		//g_GameEventMgr = (IGameEventManager2*)GetInterfacePtr("GAMEEVENTSMANAGER", "g_pGameEventsMgr", fnEngineFactory);
 		g_GameEventMgr = (IGameEventManager2*)fnEngineFactory("GAMEEVENTSMANAGER002", NULL);
-
+		
+	//	cout << iblue << "g_pRenderView:" << igreen << ": 0x" << g_pRenderView << white << endl;
+		
 
 
 	}
@@ -300,6 +353,7 @@ private:
 	bool InitialisedSuccessfuly = false;
 public:
 	ISurface* pSurface;
+	//DWORD* pClientMode;
 	DWORD* pClientMode;
 	IPanel* pPanel;
 	HLCLient* pClient;
@@ -384,252 +438,258 @@ typedef bool(*ShouldHitFunc_t)(IHandleEntity *pHandleEntity, int contentsMask);
 
 enum class CSGOClassID
 {
-	CTestTraceline = 189,
-	CTEWorldDecal = 190,
-	CTESpriteSpray = 187,
-	CTESprite = 186,
-	CTESparks = 185,
-	CTESmoke = 184,
-	CTEShowLine = 182,
-	CTEProjectedDecal = 179,
-	CTEPlayerDecal = 178,
-	CTEPhysicsProp = 175,
-	CTEParticleSystem = 174,
-	CTEMuzzleFlash = 173,
-	CTELargeFunnel = 171,
-	CTEKillPlayerAttachments = 170,
-	CTEImpact = 169,
-	CTEGlowSprite = 168,
-	CTEShatterSurface = 181,
-	CTEFootprintDecal = 165,
-	CTEFizz = 164,
-	CTEExplosion = 162,
-	CTEEnergySplash = 161,
-	CTEEffectDispatch = 160,
-	CTEDynamicLight = 159,
-	CTEDecal = 157,
-	CTEClientProjectile = 156,
-	CTEBubbleTrail = 155,
-	CTEBubbles = 154,
-	CTEBSPDecal = 153,
-	CTEBreakModel = 152,
-	CTEBloodStream = 151,
-	CTEBloodSprite = 150,
-	CTEBeamSpline = 149,
-	CTEBeamRingPoint = 148,
-	CTEBeamRing = 147,
-	CTEBeamPoints = 146,
-	CTEBeamLaser = 145,
-	CTEBeamFollow = 144,
-	CTEBeamEnts = 143,
-	CTEBeamEntPoint = 142,
-	CTEBaseBeam = 141,
-	CTEArmorRicochet = 140,
-	CTEMetalSparks = 172,
-	CSteamJet = 135,
-	CSmokeStack = 128,
-	DustTrail = 238,
-	CFireTrail = 62,
-	SporeTrail = 244,
-	SporeExplosion = 243,
-	RocketTrail = 241,
-	SmokeTrail = 242,
-	CPropVehicleDriveable = 117,
-	ParticleSmokeGrenade = 240,
-	CParticleFire = 96,
-	MovieExplosion = 239,
-	CTEGaussExplosion = 167,
-	CEnvQuadraticBeam = 55,
-	CEmbers = 45,
-	CEnvWind = 59,
-	CPrecipitation = 111,
-	CPrecipitationBlocker = 112,
-	CBaseTempEntity = 18,
-	NextBotCombatCharacter = 0,
-	CBaseAttributableItem = 4,
-	CEconEntity = 44,
-	CWeaponXM1014 = 236,
-	CWeaponTaser = 231,
-	CSmokeGrenade = 126,
-	CWeaponSG552 = 228,
-	CWeaponSawedoff = 224,
-	CWeaponNOVA = 220,
-	CIncendiaryGrenade = 85,
-	CMolotovGrenade = 93,
-	CWeaponM3 = 212,
-	CKnifeGG = 90,
-	CKnife = 89,
-	CHEGrenade = 82,
-	CFlashbang = 64,
-	CWeaponElite = 203,
-	CDecoyGrenade = 40,
-	CDEagle = 39,
-	CWeaponUSP = 235,
-	CWeaponM249 = 211,
-	CWeaponUMP45 = 234,
-	CWeaponTMP = 233,
-	CWeaponTec9 = 232,
-	CWeaponSSG08 = 230,
-	CWeaponSG556 = 229,
-	CWeaponSG550 = 227,
-	CWeaponScout = 226,
-	CWeaponSCAR20 = 225,
-	CSCAR17 = 122,
-	CWeaponP90 = 223,
-	CWeaponP250 = 222,
-	CWeaponP228 = 221,
-	CWeaponNegev = 219,
-	CWeaponMP9 = 218,
-	CWeaponMP7 = 217,
-	CWeaponMP5Navy = 216,
-	CWeaponMag7 = 215,
-	CWeaponMAC10 = 214,
-	CWeaponM4A1 = 213,
-	CWeaponHKP2000 = 210,
-	CWeaponGlock = 209,
-	CWeaponGalilAR = 208,
-	CWeaponGalil = 207,
-	CWeaponG3SG1 = 206,
-	CWeaponFiveSeven = 205,
-	CWeaponFamas = 204,
-	CWeaponBizon = 199,
-	CWeaponAWP = 198,
-	CWeaponAug = 197,
 	CAK47 = 1,
-	CWeaponCSBaseGun = 201,
-	CWeaponCSBase = 200,
-	CC4 = 29,
-	CBaseCSGrenade = 8,
-	CSmokeGrenadeProjectile = 127,
-	CMolotovProjectile = 94,
-	CDecoyProjectile = 41,
-	CFireCrackerBlast = 60,
-	CInferno = 86,
-	CChicken = 31,
-	CFootstepControl = 66,
-	CCSGameRulesProxy = 34,
-	CWeaponCubemap = 0,
-	CWeaponCycler = 202,
-	CTEPlantBomb = 176,
-	CTEFireBullets = 163,
-	CTERadioIcon = 180,
-	CPlantedC4 = 105,
-	CCSTeam = 38,
-	CCSPlayerResource = 36,
-	CCSPlayer = 35,
-	CCSRagdoll = 37,
-	CTEPlayerAnimEvent = 177,
-	CHostage = 83,
-	CHostageCarriableProp = 84,
-	CBaseCSGrenadeProjectile = 9,
-	CHandleTest = 81,
-	CTeamplayRoundBasedRulesProxy = 139,
-	CSpriteTrail = 133,
-	CSpriteOriented = 132,
-	CSprite = 131,
-	CRagdollPropAttached = 120,
-	CRagdollProp = 119,
-	CPredictedViewModel = 113,
-	CPoseController = 109,
-	CGameRulesProxy = 80,
-	CInfoLadderDismount = 87,
-	CFuncLadder = 72,
-	CTEFoundryHelpers = 166,
-	CEnvDetailController = 51,
-	CWorld = 237,
-	CWaterLODControl = 196,
-	CWaterBullet = 195,
-	CVoteController = 194,
-	CVGuiScreen = 193,
-	CPropJeep = 116,
-	CPropVehicleChoreoGeneric = 0,
-	CTriggerSoundOperator = 192,
-	CBaseVPhysicsTrigger = 22,
-	CTriggerPlayerMovement = 191,
-	CBaseTrigger = 20,
-	CTest_ProxyToggle_Networkable = 188,
-	CTesla = 183,
-	CBaseTeamObjectiveResource = 17,
-	CTeam = 138,
-	CSunlightShadowControl = 137,
-	CSun = 136,
-	CParticlePerformanceMonitor = 97,
-	CSpotlightEnd = 130,
-	CSpatialEntity = 129,
-	CSlideshowDisplay = 125,
-	CShadowControl = 124,
-	CSceneEntity = 123,
-	CRopeKeyframe = 121,
-	CRagdollManager = 118,
-	CPhysicsPropMultiplayer = 102,
-	CPhysBoxMultiplayer = 100,
-	CPropDoorRotating = 115,
-	CBasePropDoor = 16,
-	CDynamicProp = 43,
-	CProp_Hallucination = 114,
-	CPostProcessController = 110,
-	CPointCommentaryNode = 108,
-	CPointCamera = 107,
-	CPlayerResource = 106,
-	CPlasma = 105,
-	CPhysMagnet = 103,
-	CPhysicsProp = 101,
-	CStatueProp = 134,
-	CPhysBox = 99,
-	CParticleSystem = 98,
-	CMovieDisplay = 95,
-	CMaterialModifyControl = 92,
-	CLightGlow = 91,
-	CInfoOverlayAccessor = 88,
-	CFuncTrackTrain = 79,
-	CFuncSmokeVolume = 78,
-	CFuncRotating = 77,
-	CFuncReflectiveGlass = 76,
-	CFuncOccluder = 75,
-	CFuncMoveLinear = 74,
-	CFuncMonitor = 73,
-	CFunc_LOD = 68,
-	CTEDust = 158,
-	CFunc_Dust = 67,
-	CFuncConveyor = 71,
-	CFuncBrush = 70,
-	CBreakableSurface = 28,
-	CFuncAreaPortalWindow = 69,
-	CFish = 63,
-	CFireSmoke = 61,
-	CEnvTonemapController = 58,
-	CEnvScreenEffect = 56,
-	CEnvScreenOverlay = 57,
-	CEnvProjectedTexture = 54,
-	CEnvParticleScript = 53,
-	CFogController = 65,
-	CEnvDOFController = 52,
-	CCascadeLight = 30,
-	CEnvAmbientLight = 50,
-	CEntityParticleTrail = 49,
-	CEntityFreezing = 48,
-	CEntityFlame = 47,
-	CEntityDissolve = 46,
-	CDynamicLight = 42,
-	CColorCorrectionVolume = 33,
-	CColorCorrection = 32,
-	CBreakableProp = 27,
-	CBeamSpotlight = 25,
-	CBaseButton = 5,
-	CBaseToggle = 19,
-	CBasePlayer = 15,
-	CBaseFlex = 12,
-	CBaseEntity = 11,
-	CBaseDoor = 10,
-	CBaseCombatCharacter = 6,
-	CBaseAnimatingOverlay = 3,
-	CBoneFollower = 26,
 	CBaseAnimating = 2,
-	CAI_BaseNPC = 0,
-	CBeam = 24,
-	CBaseViewModel = 21,
-	CBaseParticleEntity = 14,
-	CBaseGrenade = 13,
+	CBaseAnimatingOverlay = 3,
+	CBaseAttributableItem = 4,
+	CBaseButton = 5,
+	CBaseCombatCharacter = 6,
 	CBaseCombatWeapon = 7,
-	CBaseWeaponWorldModel = 23
+	CBaseCSGrenade = 8,
+	CBaseCSGrenadeProjectile = 9,
+	CBaseDoor = 10,
+	CBaseEntity = 11,
+	CBaseFlex = 12,
+	CBaseGrenade = 13,
+	CBaseParticleEntity = 14,
+	CBasePlayer = 15,
+	CBasePropDoor = 16,
+	CBaseTeamObjectiveResource = 17,
+	CBaseTempEntity = 18,
+	CBaseToggle = 19,
+	CBaseTrigger = 20,
+	CBaseViewModel = 21,
+	CBaseVPhysicsTrigger = 22,
+	CBaseWeaponWorldModel = 23,
+	CBeam = 24,
+	CBeamSpotlight = 25,
+	CBoneFollower = 26,
+	CBreakableProp = 27,
+	CBreakableSurface = 28,
+	CC4 = 29,
+	CCascadeLight = 30,
+	CChicken = 31,
+	CColorCorrection = 32,
+	CColorCorrectionVolume = 33,
+	CCSGameRulesProxy = 34,
+	CCSPlayer = 35,
+	CCSPlayerResource = 36,
+	CCSRagdoll = 37,
+	CCSTeam = 38,
+	CDEagle = 39,
+	CDecoyGrenade = 40,
+	CDecoyProjectile = 41,
+	CDynamicLight = 42,
+	CDynamicProp = 43,
+	CEconEntity = 44,
+	CEconWearable = 45,
+	CEmbers = 46,
+	CEntityDissolve = 47,
+	CEntityFlame = 48,
+	CEntityFreezing = 49,
+	CEntityParticleTrail = 50,
+	CEnvAmbientLight = 51,
+	CEnvDetailController = 52,
+	CEnvDOFController = 53,
+	CEnvParticleScript = 54,
+	CEnvProjectedTexture = 55,
+	CEnvQuadraticBeam = 56,
+	CEnvScreenEffect = 57,
+	CEnvScreenOverlay = 58,
+	CEnvTonemapController = 59,
+	CEnvWind = 60,
+	CFEPlayerDecal = 61,
+	CFireCrackerBlast = 62,
+	CFireSmoke = 63,
+	CFireTrail = 64,
+	CFish = 65,
+	CFlashbang = 66,
+	CFogController = 67,
+	CFootstepControl = 68,
+	CFunc_Dust = 69,
+	CFunc_LOD = 70,
+	CFuncAreaPortalWindow = 71,
+	CFuncBrush = 72,
+	CFuncConveyor = 73,
+	CFuncLadder = 74,
+	CFuncMonitor = 75,
+	CFuncMoveLinear = 76,
+	CFuncOccluder = 77,
+	CFuncReflectiveGlass = 78,
+	CFuncRotating = 79,
+	CFuncSmokeVolume = 80,
+	CFuncTrackTrain = 81,
+	CGameRulesProxy = 82,
+	CHandleTest = 83,
+	CHEGrenade = 84,
+	CHostage = 85,
+	CHostageCarriableProp = 86,
+	CIncendiaryGrenade = 87,
+	CInferno = 88,
+	CInfoLadderDismount = 89,
+	CInfoOverlayAccessor = 90,
+	CItem_Healthshot = 91,
+	CItemDogtags = 92,
+	CKnife = 93,
+	CKnifeGG = 94,
+	CLightGlow = 95,
+	CMaterialModifyControl = 96,
+	CMolotovGrenade = 97,
+	CMolotovProjectile = 98,
+	CMovieDisplay = 99,
+	CParticleFire = 100,
+	CParticlePerformanceMonitor = 101,
+	CParticleSystem = 102,
+	CPhysBox = 103,
+	CPhysBoxMultiplayer = 104,
+	CPhysicsProp = 105,
+	CPhysicsPropMultiplayer = 106,
+	CPhysMagnet = 107,
+	CPlantedC4 = 108,
+	CPlasma = 109,
+	CPlayerResource = 110,
+	CPointCamera = 111,
+	CPointCommentaryNode = 112,
+	CPointWorldText = 113,
+	CPoseController = 114,
+	CPostProcessController = 115,
+	CPrecipitation = 116,
+	CPrecipitationBlocker = 117,
+	CPredictedViewModel = 118,
+	CProp_Hallucination = 119,
+	CPropDoorRotating = 120,
+	CPropJeep = 121,
+	CPropVehicleDriveable = 122,
+	CRagdollManager = 123,
+	CRagdollProp = 124,
+	CRagdollPropAttached = 125,
+	CRopeKeyframe = 126,
+	CSCAR17 = 127,
+	CSceneEntity = 128,
+	CSensorGrenade = 129,
+	CSensorGrenadeProjectile = 130,
+	CShadowControl = 131,
+	CSlideshowDisplay = 132,
+	CSmokeGrenade = 133,
+	CSmokeGrenadeProjectile = 134,
+	CSmokeStack = 135,
+	CSpatialEntity = 136,
+	CSpotlightEnd = 137,
+	CSprite = 138,
+	CSpriteOriented = 139,
+	CSpriteTrail = 140,
+	CStatueProp = 141,
+	CSteamJet = 142,
+	CSun = 143,
+	CSunlightShadowControl = 144,
+	CTeam = 145,
+	CTeamplayRoundBasedRulesProxy = 146,
+	CTEArmorRicochet = 147,
+	CTEBaseBeam = 148,
+	CTEBeamEntPoint = 149,
+	CTEBeamEnts = 150,
+	CTEBeamFollow = 151,
+	CTEBeamLaser = 152,
+	CTEBeamPoints = 153,
+	CTEBeamRing = 154,
+	CTEBeamRingPoint = 155,
+	CTEBeamSpline = 156,
+	CTEBloodSprite = 157,
+	CTEBloodStream = 158,
+	CTEBreakModel = 159,
+	CTEBSPDecal = 160,
+	CTEBubbles = 161,
+	CTEBubbleTrail = 162,
+	CTEClientProjectile = 163,
+	CTEDecal = 164,
+	CTEDust = 165,
+	CTEDynamicLight = 166,
+	CTEEffectDispatch = 167,
+	CTEEnergySplash = 168,
+	CTEExplosion = 169,
+	CTEFireBullets = 170,
+	CTEFizz = 171,
+	CTEFootprintDecal = 172,
+	CTEFoundryHelpers = 173,
+	CTEGaussExplosion = 174,
+	CTEGlowSprite = 175,
+	CTEImpact = 176,
+	CTEKillPlayerAttachments = 177,
+	CTELargeFunnel = 178,
+	CTEMetalSparks = 179,
+	CTEMuzzleFlash = 180,
+	CTEParticleSystem = 181,
+	CTEPhysicsProp = 182,
+	CTEPlantBomb = 183,
+	CTEPlayerAnimEvent = 184,
+	CTEPlayerDecal = 185,
+	CTEProjectedDecal = 186,
+	CTERadioIcon = 187,
+	CTEShatterSurface = 188,
+	CTEShowLine = 189,
+	CTesla = 190,
+	CTESmoke = 191,
+	CTESparks = 192,
+	CTESprite = 193,
+	CTESpriteSpray = 194,
+	CTest_ProxyToggle_Networkable = 194,
+	CTestTraceline = 196,
+	CTEWorldDecal = 197,
+	CTriggerPlayerMovement = 198,
+	CTriggerSoundOperator = 199,
+	CVGuiScreen = 200,
+	CVoteController = 201,
+	CWaterBullet = 202,
+	CWaterLODControl = 203,
+	CWeaponAug = 204,
+	CWeaponAWP = 205,
+	CWeaponBaseItem = 206,
+	CWeaponBizon = 207,
+	CWeaponCSBase = 208,
+	CWeaponCSBaseGun = 209,
+	CWeaponCycler = 210,
+	CWeaponElite = 211,
+	CWeaponFamas = 212,
+	CWeaponFiveSeven = 213,
+	CWeaponG3SG1 = 214,
+	CWeaponGalil = 215,
+	CWeaponGalilAR = 216,
+	CWeaponGlock = 217,
+	CWeaponHKP2000 = 218,
+	CWeaponM249 = 219,
+	CWeaponM3 = 220,
+	CWeaponM4A1 = 221,
+	CWeaponMAC10 = 222,
+	CWeaponMag7 = 223,
+	CWeaponMP5Navy = 224,
+	CWeaponMP7 = 225,
+	CWeaponMP9 = 226,
+	CWeaponNegev = 227,
+	CWeaponNOVA = 228,
+	CWeaponP228 = 229,
+	CWeaponP250 = 230,
+	CWeaponP90 = 231,
+	CWeaponSawedoff = 232,
+	CWeaponSCAR20 = 233,
+	CWeaponScout = 234,
+	CWeaponSG550 = 235,
+	CWeaponSG552 = 236,
+	CWeaponSG556 = 237,
+	CWeaponSSG08 = 238,
+	CWeaponTaser = 239,
+	CWeaponTec9 = 240,
+	CWeaponTMP = 241,
+	CWeaponUMP45 = 242,
+	CWeaponUSP = 243,
+	CWeaponXM1014 = 244,
+	CWorld = 245,
+	DustTrail = 246,
+	MovieExplosion = 247,
+	ParticleSmokeGrenade = 248,
+	RocketTrail = 249,
+	SmokeTrail = 250,
+	SporeExplosion = 251,
+	SporeTrail = 252
+
+	
 };
