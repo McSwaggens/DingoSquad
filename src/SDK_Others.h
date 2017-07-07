@@ -357,9 +357,9 @@ enum EClassIds {
 #define GLOWINDEXOFFSET 0x1DB8
 
 //LIFESTATE
-#define	LIFE_ALIVE				0 
-#define	LIFE_DYING				1 
-#define	LIFE_DEAD				2 
+#define	LIFE_ALIVE				0
+#define	LIFE_DYING				1
+#define	LIFE_DEAD				2
 #define LIFE_RESPAWNABLE		3
 #define LIFE_DISCARDBODY		4
 
@@ -374,7 +374,6 @@ enum EClassIds {
 #define	FL_CLIENT				(1<<8)	// Is a player
 #define FL_FAKECLIENT			(1<<9)	// Fake client, simulated server side; don't send network messages to them
 #define	FL_INWATER				(1<<10)	// In water
-
 
 //USERCMD BUTTONS
 #define IN_ATTACK		(1 << 0)
